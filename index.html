@@ -60,6 +60,16 @@
         img {
             max-width: 100%;
         }
+
+        #downloadBtn {
+            display: none;
+            margin-top: 15px;
+            background-color: #28a745;
+        }
+
+        #downloadBtn:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 <body>
@@ -69,21 +79,48 @@
         <input type="text" id="inputText" placeholder="Pega tu URL aquí" />
         <button onclick="generateQRCode()">Generar QR</button>
         <div id="qrCode"></div>
+        <button id="downloadBtn" onclick="downloadQRCode()">Descargar QR</button>
     </div>
 
     <script>
+        let qrUrl = '';
+
         function generateQRCode() {
             const inputText = document.getElementById("inputText").value.trim();
             if (inputText) {
                 // Llamar a la API de QR
-                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(inputText)}`;
+                qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(inputText)}`;
 
                 // Mostrar el QR en la página
                 const qrCodeDiv = document.getElementById("qrCode");
-                qrCodeDiv.innerHTML = `<img src="${qrUrl}" alt="Código QR" />`;
+                qrCodeDiv.innerHTML = `<img src="${qrUrl}" alt="Código QR" id="qrImage" />`;
+
+                // Mostrar el botón de descarga
+                document.getElementById("downloadBtn").style.display = "inline-block";
             } else {
                 alert("Por favor, ingresa una URL o texto.");
             }
+        }
+
+        function downloadQRCode() {
+            const qrImage = document.getElementById("qrImage");
+
+            // Crear un canvas para dibujar la imagen
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Establecer el tamaño del canvas igual al tamaño de la imagen del QR
+            canvas.width = qrImage.width;
+            canvas.height = qrImage.height;
+
+            // Dibujar la imagen del QR en el canvas
+            ctx.drawImage(qrImage, 0, 0);
+
+            // Convertir el canvas en un enlace de descarga
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL("image/png");  // Obtiene la imagen en formato PNG
+            link.download = 'codigo-qr.png';  // Nombre del archivo descargado
+            link.click();
         }
     </script>
 </body>
